@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_assignment_03/model/todo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class NewSubject extends StatefulWidget{
+class NewSubject extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return NewSubjectState();
   }
 }
-class NewSubjectState extends State<NewSubject>{
 
+class NewSubjectState extends State<NewSubject> {
   final _formKey = GlobalKey<FormState>();
 
   final textController = TextEditingController();
-
-  TodoProvider provider = TodoProvider();
 
   @override
   Widget build(BuildContext context) {
@@ -27,25 +25,23 @@ class NewSubjectState extends State<NewSubject>{
           children: <Widget>[
             TextFormField(
               controller: textController,
-              validator: (value){
-                if (value.isEmpty){
+              validator: (value) {
+                if (value.isEmpty) {
                   return "Please fill subject";
                 }
               },
               decoration: InputDecoration(
-                labelText: "Subject",
-                contentPadding: const EdgeInsets.all(15)
-              ),
+                  labelText: "Subject",
+                  contentPadding: const EdgeInsets.all(15)),
             ),
             RaisedButton(
               child: Text("Save"),
               onPressed: () async {
-                if(_formKey.currentState.validate()){
-                  await provider.open("todo.db");
-                  Todo todo = Todo();
-                  todo.title = textController.text;
-                  todo.done = false;
-                  await provider.insert(todo);
+                if (_formKey.currentState.validate()) {
+                  Firestore.instance
+                      .collection('todo')
+                      .document()
+                      .setData({'title': textController.text, 'done': false});
                   Navigator.pop(context);
                 }
               },
@@ -55,5 +51,4 @@ class NewSubjectState extends State<NewSubject>{
       ),
     );
   }
-
 }
